@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package bikerenting.grpc.bikes.v1;
+option go_package = "bikes";
+
+// Bike definition
+
+message Bike {
+  string id     = 1;
+  string owner_name = 2;
+  string type   = 3;
+  string make   = 4;
+  string serial = 5;
+
+}

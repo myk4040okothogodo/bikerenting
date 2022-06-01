@@ -1,0 +1,80 @@
+syntax = "proto3";
+package bikerenting.grpc.bikes.v1;
+option go_package = "bikes";
+import "proto/bikes/bikes_messages.proto";
+
+
+//API for managing bikes
+service BikesAPI {
+    //Get all bikes
+    rpc ListBikes(ListBikesRequest) returns (ListBikesResponse);
+    //Get bike by id
+    rpc GetBike(GetBikeRequest)     returns (GetBikeResponse);
+    //Get bikes by ids
+    rpc GetBikes(GetBikesRequest)   returns (GetBikesResponse);
+    // Get bikes by type
+    rpc GetBikesByTYPE(GetBikesByTYPERequest) returns (GetBikesByTYPEResponse);
+    // Get bikes by make
+    rpc GetBikesByMAKE(GetBikesByMAKERequest) returns (GetBikesByMAKEResponse);
+    // Get bikes by owner_name
+    rpc GetBikesByOWNER(GetBikesByOWNERRequest) returns (GetBikesByOWNERResponse);
+    // Add new bike
+    rpc AddBike(AddBikeRequest)     returns  (AddBikeResponse);
+    // Delete bike
+    rpc DeleteBike(DeleteBikeRequest) returns (DeleteBikeResponse);
+  }
+  
+  message ListBikesRequest {
+  }
+  message ListBikesResponse {
+     repeated Bike bikes = 1;
+  }
+  
+  message GetBikeRequest {
+    string id = 1;
+  }
+  message GetBikeResponse {
+    Bike bike = 1;
+  }
+
+  message GetBikesRequest {
+    repeated string ids = 1;
+  }
+  message GetBikesResponse {
+    repeated Bike bikes = 1;
+  }
+
+  message GetBikesByTYPERequest {
+    string type = 1;
+  }
+  message GetBikesByTYPEResponse {
+    repeated Bike bikes = 1;
+  }
+  
+  message GetBikesByMAKERequest {
+    string make = 1;
+  }
+  message GetBikesByMAKEResponse {
+    repeated Bike bikes = 1;
+  }
+
+  message GetBikesByOWNERRequest {
+    string owner_name = 1;
+  }
+  message GetBikesByOWNERResponse {
+    repeated Bike bikes = 1;
+  }
+
+  message AddBikeRequest {
+    Bike bike = 1;
+  }
+  message AddBikeResponse {
+    Bike bike = 1;
+  }
+
+  message DeleteBikeRequest {
+    string id = 1;
+  }
+
+  message DeleteBikeResponse { 
+  }

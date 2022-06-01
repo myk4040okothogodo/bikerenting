@@ -1,0 +1,57 @@
+syntax = "proto3";
+package tutorial.grpc.rentees.v1;
+option go_package = "rentees";
+import "proto/rentees/rentees_messages.proto";
+
+//API for managing rentees
+service RenteesAPI {
+    //Get all rentees
+    rpc ListRentees(ListRenteesRequest) returns (ListRenteesResponse);
+    // Get rentee by bike id
+    rpc GetRenteeByBikeId(GetRenteeByBikeIdRequest) returns (GetRenteeByBikeIdResponse);
+    // Get rentee by id
+    rpc GetRentee(GetRenteeRequest) returns (GetRenteeResponse);
+    // Add new rentee
+    rpc AddRentee(AddRenteeRequest) returns (AddRenteeResponse);
+    // Update rentee
+    rpc UpdateRentee(UpdateRenteeRequest) returns (UpdateRenteeResponse);
+}
+
+message ListRenteesRequest {
+}
+
+message ListRenteesResponse {
+  repeated Rentee rentees = 1;
+}
+
+message GetRenteeByBikeIdRequest{
+  string id = 1;
+}
+
+message GetRenteeByBikeIdResponse {
+  Rentee rentee = 1;
+}
+
+message GetRenteeRequest {
+  string id = 1 ;
+}
+
+message GetRenteeResponse {
+  Rentee rentee = 1;
+}
+
+message AddRenteeRequest {
+  Rentee rentee = 1;
+}
+
+message AddRenteeResponse {
+  Rentee rentee = 1;
+}
+
+message UpdateRenteeRequest {
+  Rentee rentee = 1;
+}
+
+message UpdateRenteeResponse {
+  Rentee rentee = 1;
+}

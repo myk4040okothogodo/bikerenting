@@ -1,0 +1,14 @@
+syntax = "proto3";
+package bikerenting.grpc.rentees.v1;
+option go_package ="rentees";
+
+// Customer definition
+message Rentee {
+  string id         = 1;
+  string first_name = 2;
+  string last_name  = 3;
+  string National_Id_Number = 4;
+  string phone      = 5;
+  string email      = 6;
+  repeated string held_bikes = 7;
+}
