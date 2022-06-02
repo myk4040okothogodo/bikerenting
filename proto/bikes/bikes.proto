@@ -16,6 +16,8 @@ service BikesAPI {
     rpc GetBikesByTYPE(GetBikesByTYPERequest) returns (GetBikesByTYPEResponse);
     // Get bikes by make
     rpc GetBikesByMAKE(GetBikesByMAKERequest) returns (GetBikesByMAKEResponse);
+    // Get bike bys Serial Number
+    rpc GetBikeBySERIAL(GetBikeBySERIALRequest) returns (GetBikeBySERIALResponse);
     // Get bikes by owner_name
     rpc GetBikesByOWNER(GetBikesByOWNERRequest) returns (GetBikesByOWNERResponse);
     // Add new bike
@@ -56,6 +58,13 @@ service BikesAPI {
   }
   message GetBikesByMAKEResponse {
     repeated Bike bikes = 1;
+  }
+
+  message GetBikeBySERIALRequest {
+    string serial = 1;
+  }
+  message GetBikeBySERIALResponse {
+    Bike bike = 1;
   }
 
   message GetBikesByOWNERRequest {

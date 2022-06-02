@@ -40,7 +40,6 @@ func NewServer(ctx context.Context, database driver.Database)(*Server, error) {
     }, nil
 }
 
-
 func (s *Server) Run() {
     port := os.Getenv("APP_PORT")
     if port == "" {
@@ -64,7 +63,6 @@ func (s *Server) Run() {
         grpcServer.Serve(listener)
     }()
 }
-
 
 func (s *Server) ListBikes(ctx context.Context, in *bikesv1.ListBikesRequest)(*bikesv1.ListBikesResponse, error){
     if in == nil {
@@ -92,7 +90,6 @@ func (s *Server) ListBikes(ctx context.Context, in *bikesv1.ListBikesRequest)(*b
     }
     return &bikesv1.ListBikesResponse{Bikes: allBikes}, nil
 }
-
 
 func (s *Server) GetBike(ctx context.Context, in *bikesv1.GetBikeRequest)(*bikesv1.GetBikeResponse, error){
     if in == nil || in.Id == "" {
@@ -162,7 +159,7 @@ func (s *Server) GetBikeByTYPE(ctx context.Context, in *bikesv1.GetBikeByTYPEReq
     FOR bike IN %s
         FILTER bike.type == @type
             RETURN bike`
-    query := fmt.Sprintf(queryBikeByTYPE, bikesCollectionName)
+    query := fmt.Sprintf(queryBikeByISBN, bikesCollectionName)
     bindVars := map[string]interface{}{"type": in.Type}
 
     cursor, err := s.database.Query(ctx, query, bindVars)
@@ -182,99 +179,6 @@ func (s *Server) GetBikeByTYPE(ctx context.Context, in *bikesv1.GetBikeByTYPEReq
 
     return &bikesv1.GetBikeByTYPEResponse{Bike: b}, nil
 }
-
-
-func (s *Server) GetBikeByOWNER(ctx context.Context, in *bikesv1.GetBikeByOWNERRequest)(*bikesv1.GetBikeByOWNERResponse, error){
-    if in == nil || in.OwnerName == "" {
-        return nil, fmt.Errorf("Bike owner is not provided")
-    }
-
-    const queryBikeByTYPE = `
-    FOR bike IN %s
-        FILTER bike.owner_name == @ownername
-            RETURN bike`
-    query := fmt.Sprintf(queryBikeByOWNER, bikesCollectionName)
-    bindVars := map[string]interface{}{"owner_name": in.OwnerName}
-
-    cursor, err := s.database.Query(ctx, query, bindVars)
-    if err != nil {
-        return nil, fmt.Errorf("Failed to iterate over bike documents with query '%s': %s", queryBikeByOWNER, err)
-    }
-    defer cursor.Close()
-
-    b := new(bikesv1.Bike)
-    meta, err := cursor.ReadDocument(ctx, b)
-    if driver.IsNoMoreDocuments(err){
-        return nil, fmt.Errorf("Bike with OWNER '%s' not found: %s", in.OwnerName, err)
-    } else if err != nil {
-        return nil, fmt.Errorf("Failed to read bike document: %s", err)
-    }
-    b.Id = meta.Key
-
-    return &bikesv1.GetBikeByOWNERResponse{Bike: b}, nil
-}
-
-
-func (s *Server) GetBikeByMAKE(ctx context.Context, in *bikesv1.GetBikeByMAKERequest)(*bikesv1.GetBikeByMAKEResponse, error){
-    if in == nil || in.Make == "" {
-        return nil, fmt.Errorf("Bike make is not provided")
-    }
-
-    const queryBikeByMAKE = `
-    FOR bike IN %s
-        FILTER bike.make == @make
-            RETURN bike`
-    query := fmt.Sprintf(queryBikeByMAKE, bikesCollectionName)
-    bindVars := map[string]interface{}{"make": in.Make}
-
-    cursor, err := s.database.Query(ctx, query, bindVars)
-    if err != nil {
-        return nil, fmt.Errorf("Failed to iterate over bike documents with query '%s': %s", queryBikeByMAKE, err)
-    }
-    defer cursor.Close()
-
-    b := new(bikesv1.Bike)
-    meta, err := cursor.ReadDocument(ctx, b)
-    if driver.IsNoMoreDocuments(err){
-        return nil, fmt.Errorf("Bike with MAKE '%s' not found: %s", in.Make, err)
-    } else if err != nil {
-        return nil, fmt.Errorf("Failed to read bike document: %s", err)
-    }
-    b.Id = meta.Key
-
-    return &bikesv1.GetBikeByMAKEResponse{Bike: b}, nil
-}
-
-func (s *Server) GetBikeBySERIAL(ctx context.Context, in *bikesv1.GetBikeBySERIALRequest)(*bikesv1.GetBikeBySERIALResponse, error){
-    if in == nil || in.Serial == "" {
-        return nil, fmt.Errorf("Bike serial is not provided")
-    }
-
-    const queryBikeBySERIAL = `
-    FOR bike IN %s
-        FILTER bike.serial == @serial
-            RETURN bike`
-    query := fmt.Sprintf(queryBikeBySERIAL, bikesCollectionName)
-    bindVars := map[string]interface{}{"serial": in.Serial}
-
-    cursor, err := s.database.Query(ctx, query, bindVars)
-    if err != nil {
-        return nil, fmt.Errorf("Failed to iterate over bike documents with query '%s': %s", queryBikeBySERIAL, err)
-    }
-    defer cursor.Close()
-
-    b := new(bikesv1.Bike)
-    meta, err := cursor.ReadDocument(ctx, b)
-    if driver.IsNoMoreDocuments(err){
-        return nil, fmt.Errorf("Bike with SERIAL '%s' not found: %s", in.Serial, err)
-    } else if err != nil {
-        return nil, fmt.Errorf("Failed to read bike document: %s", err)
-    }
-    b.Id = meta.Key
-
-    return &bikesv1.GetBikeBySERIALResponse{Bike: b}, nil
-}
-
 
 
 func (s *Server) AddBike(ctx context.Context, in *bikesv1.AddBikeRequest)(*bikesv1.AddBikeResponse, error){
