@@ -1,5 +1,6 @@
 package server
 
+
 import (
     "context"
     "fmt"
@@ -153,7 +154,7 @@ func (s *Server) GetBikes(ctx context.Context, in *bikesv1.GetBikesRequest) (*bi
     return &bikesv1.GetBikesResponse{Bikes: bikes}, nil
 }
 
-func (s *Server) GetBikeByTYPE(ctx context.Context, in *bikesv1.GetBikeByTYPERequest)(*bikesv1.GetBikeByTYPEResponse, error){
+func (s *Server) GetBikesByTYPE(ctx context.Context, in *bikesv1.GetBikesByTYPERequest)(*bikesv1.GetBikesByTYPEResponse, error){
     if in == nil || in.Type == "" {
         return nil, fmt.Errorf("Bike type is not provided")
     }
@@ -171,25 +172,29 @@ func (s *Server) GetBikeByTYPE(ctx context.Context, in *bikesv1.GetBikeByTYPEReq
     }
     defer cursor.Close()
 
-    b := new(bikesv1.Bike)
-    meta, err := cursor.ReadDocument(ctx, b)
-    if driver.IsNoMoreDocuments(err){
-        return nil, fmt.Errorf("Bike with TYPE '%s' not found: %s", in.Type, err)
-    } else if err != nil {
-        return nil, fmt.Errorf("Failed to read bike document: %s", err)
-    }
-    b.Id = meta.Key
-
-    return &bikesv1.GetBikeByTYPEResponse{Bike: b}, nil
+   bikes := []*bikesv1.Bike{}
+   for {
+     bike := new(bikesv1.Bike)
+     meta, err := cursor.ReadDocument(ctx, bike)
+     if driver.IsNoMoreDocuments(err){
+       break
+     } else if err != nil {
+         log.Print(err)
+         return nil, fmt.Errorf("failed to read rentees document: %s", err)
+     }
+     bike.Id = meta.Key
+     bikes = append(bikes, bike)
+   }
+   return &bikesv1.GetBikesByTYPEResponse{Bikes: bikes}, nil
 }
+    
 
-
-func (s *Server) GetBikeByOWNER(ctx context.Context, in *bikesv1.GetBikeByOWNERRequest)(*bikesv1.GetBikeByOWNERResponse, error){
+func (s *Server) GetBikesByOWNER(ctx context.Context, in *bikesv1.GetBikesByOWNERRequest)(*bikesv1.GetBikesByOWNERResponse, error){
     if in == nil || in.OwnerName == "" {
         return nil, fmt.Errorf("Bike owner is not provided")
     }
 
-    const queryBikeByTYPE = `
+    const queryBikeByOWNER = `
     FOR bike IN %s
         FILTER bike.owner_name == @ownername
             RETURN bike`
@@ -202,20 +207,24 @@ func (s *Server) GetBikeByOWNER(ctx context.Context, in *bikesv1.GetBikeByOWNERR
     }
     defer cursor.Close()
 
-    b := new(bikesv1.Bike)
-    meta, err := cursor.ReadDocument(ctx, b)
-    if driver.IsNoMoreDocuments(err){
-        return nil, fmt.Errorf("Bike with OWNER '%s' not found: %s", in.OwnerName, err)
-    } else if err != nil {
-        return nil, fmt.Errorf("Failed to read bike document: %s", err)
-    }
-    b.Id = meta.Key
-
-    return &bikesv1.GetBikeByOWNERResponse{Bike: b}, nil
+     bikes := []*bikesv1.Bike{}
+   for {
+     bike := new(bikesv1.Bike)
+     meta, err := cursor.ReadDocument(ctx, bike)
+     if driver.IsNoMoreDocuments(err){
+       break
+     } else if err != nil {
+         log.Print(err)
+         return nil, fmt.Errorf("failed to read rentees document: %s", err)
+     }
+     bike.Id = meta.Key
+     bikes = append(bikes, bike)
+   }
+   return &bikesv1.GetBikesByOWNERResponse{Bikes: bikes}, nil
 }
 
 
-func (s *Server) GetBikeByMAKE(ctx context.Context, in *bikesv1.GetBikeByMAKERequest)(*bikesv1.GetBikeByMAKEResponse, error){
+func (s *Server) GetBikesByMAKE(ctx context.Context, in *bikesv1.GetBikesByMAKERequest)(*bikesv1.GetBikesByMAKEResponse, error){
     if in == nil || in.Make == "" {
         return nil, fmt.Errorf("Bike make is not provided")
     }
@@ -233,53 +242,57 @@ func (s *Server) GetBikeByMAKE(ctx context.Context, in *bikesv1.GetBikeByMAKEReq
     }
     defer cursor.Close()
 
-    b := new(bikesv1.Bike)
-    meta, err := cursor.ReadDocument(ctx, b)
-    if driver.IsNoMoreDocuments(err){
-        return nil, fmt.Errorf("Bike with MAKE '%s' not found: %s", in.Make, err)
-    } else if err != nil {
-        return nil, fmt.Errorf("Failed to read bike document: %s", err)
-    }
-    b.Id = meta.Key
-
-    return &bikesv1.GetBikeByMAKEResponse{Bike: b}, nil
+     bikes := []*bikesv1.Bike{}
+     for {
+     bike := new(bikesv1.Bike)
+     meta, err := cursor.ReadDocument(ctx, bike)
+     if driver.IsNoMoreDocuments(err){
+       break
+     } else if err != nil {
+         log.Print(err)
+         return nil, fmt.Errorf("failed to read rentees document: %s", err)
+     }
+     bike.Id = meta.Key
+     bikes = append(bikes, bike)
+   }
+   return &bikesv1.GetBikesByMAKEResponse{Bikes: bikes}, nil
 }
 
-func (s *Server) GetBikeBySERIAL(ctx context.Context, in *bikesv1.GetBikeBySERIALRequest)(*bikesv1.GetBikeBySERIALResponse, error){
-    if in == nil || in.Serial == "" {
-        return nil, fmt.Errorf("Bike serial is not provided")
-    }
+//func (s *Server) GetBikeBySERIAL(ctx context.Context, in *bikesv1.GetBikesSERIALRequest)(*bikesv1.GetBikesBySERIALResponse, error){
+//    if in == nil || in.Serial == "" {
+//        return nil, fmt.Errorf("Bike serial is not provided")
+//    }
 
-    const queryBikeBySERIAL = `
-    FOR bike IN %s
-        FILTER bike.serial == @serial
-            RETURN bike`
-    query := fmt.Sprintf(queryBikeBySERIAL, bikesCollectionName)
-    bindVars := map[string]interface{}{"serial": in.Serial}
+//    const queryBikeBySERIAL = `
+//    FOR bike IN %s
+//        FILTER bike.serial == @serial
+//            RETURN bike`
+//    query := fmt.Sprintf(queryBikeBySERIAL, bikesCollectionName)
+//    bindVars := map[string]interface{}{"serial": in.Serial}
 
-    cursor, err := s.database.Query(ctx, query, bindVars)
-    if err != nil {
-        return nil, fmt.Errorf("Failed to iterate over bike documents with query '%s': %s", queryBikeBySERIAL, err)
-    }
-    defer cursor.Close()
+//    cursor, err := s.database.Query(ctx, query, bindVars)
+//    if err != nil {
+//        return nil, fmt.Errorf("Failed to iterate over bike documents with query '%s': %s", queryBikeBySERIAL, err)
+//    }
+//    defer cursor.Close()
 
-    b := new(bikesv1.Bike)
-    meta, err := cursor.ReadDocument(ctx, b)
-    if driver.IsNoMoreDocuments(err){
-        return nil, fmt.Errorf("Bike with SERIAL '%s' not found: %s", in.Serial, err)
-    } else if err != nil {
-        return nil, fmt.Errorf("Failed to read bike document: %s", err)
-    }
-    b.Id = meta.Key
+//    b := new(bikesv1.Bike)
+//    meta, err := cursor.ReadDocument(ctx, b)
+//    if driver.IsNoMoreDocuments(err){
+//        return nil, fmt.Errorf("Bike with SERIAL '%s' not found: %s", in.Serial, err)
+//    } else if err != nil {
+//        return nil, fmt.Errorf("Failed to read bike document: %s", err)
+//    }
+//    b.Id = meta.Key
 
-    return &bikesv1.GetBikeBySERIALResponse{Bike: b}, nil
-}
+//    return &bikesv1.GetBikesBySERIALResponse{Bike: b}, nil
+//}
 
 
 
 func (s *Server) AddBike(ctx context.Context, in *bikesv1.AddBikeRequest)(*bikesv1.AddBikeResponse, error){
     if in == nil || in.Bike == nil {
-        return nil, fmt.Errorf("Book is not provided")
+        return nil, fmt.Errorf("Bike is not provided")
     }
 
     meta, err := s.bikesCollection.CreateDocument(ctx, in.Bike)
@@ -287,7 +300,7 @@ func (s *Server) AddBike(ctx context.Context, in *bikesv1.AddBikeRequest)(*bikes
         return nil, fmt.Errorf("failed to create bike: %s", err)
     }
 
-    in.Book.Id = meta.Key
+    in.Bike.Id = meta.Key
     return &bikesv1.AddBikeResponse{Bike: in.Bike}, nil
 }
 

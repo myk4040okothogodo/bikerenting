@@ -9,7 +9,7 @@ replace github.com/myk4040okothogodo/bikerenting/gen/go/proto/rentees => ../../g
 require (
 	github.com/arangodb/go-driver v1.3.2
 	github.com/myk4040okothogodo/bikerenting/db v0.0.0-00010101000000-000000000000
-	github.com/myk4040okothogodo/bikerenting/gen/go/proto/rentees  latest
+	github.com/myk4040okothogodo/bikerenting/gen/go/proto/rentees v0.0.0-20220602115133-471c7e03d352
 	google.golang.org/grpc v1.47.0
 )
 

@@ -73,7 +73,7 @@ func (s *Server) ListRentees(ctx context.Context, in *renteesv1.ListRenteesReque
     for {
         rentee := new(renteesv1.Rentee)
         var meta driver.DocumentMeta
-        meta, err := cursor.ReadDocument(ctx, holder)
+        meta, err := cursor.ReadDocument(ctx, rentee)
         if driver.IsNoMoreDocuments(err) {
             break
         } else if err != nil {
@@ -112,7 +112,7 @@ func (s *Server) GetRenteeByBikeId(ctx context.Context, in *renteesv1.GetRenteeB
         return nil, fmt.Errorf("Bike id is not provided")
     }
 
-    const queryHolderByBikeId = `
+    const queryRenteeByBikeId = `
     FOR rentee IN %s
         FOR bikeId IN rentee.held_bikes
            FILTER bikeId == @bikeId
@@ -172,14 +172,14 @@ func (s *Server) GetRenteesByBikeTYPE(ctx context.Context, in *renteesv1.GetRent
         rentees = append(rentees, rentee)
     }
     return &renteesv1.GetRenteesByBikeTYPEResponse{Rentees: rentees}, nil
-
+  }
 
 func (s *Server) GetRenteesByBikeMAKE(ctx context.Context, in *renteesv1.GetRenteesByBikeMAKERequest)(*renteesv1.GetRenteesByBikeMAKEResponse, error){
     if in == nil || in.Make == " " {
         return nil, fmt.Errorf("Request is empty")
     }
 
-    const queryHolderByBikeMAKE = `
+    const queryRenteeByBikeMAKE = `
     FOR rentee IN %s
         FOR bikeMake IN rentee.held_bikes
            FILTER bikeMake == @make
@@ -208,7 +208,7 @@ func (s *Server) GetRenteesByBikeMAKE(ctx context.Context, in *renteesv1.GetRent
         rentees = append(rentees, rentee)
     }
     return &renteesv1.GetRenteesByBikeMAKEResponse{Rentees: rentees}, nil
-
+  }
 
 func (s *Server) GetRenteesByBikeOWNER(ctx context.Context, in *renteesv1.GetRenteesByBikeOWNERRequest)(*renteesv1.GetRenteesByBikeOWNERResponse, error){
     if in == nil || in.OwnerName == " " {
@@ -244,7 +244,7 @@ func (s *Server) GetRenteesByBikeOWNER(ctx context.Context, in *renteesv1.GetRen
         rentees = append(rentees, rentee)
     }
     return &renteesv1.GetRenteesByBikeOWNERResponse{Rentees: rentees}, nil
-
+  }
 
 func (s *Server) AddRentee(ctx  context.Context, in *renteesv1.AddRenteeRequest) (*renteesv1.AddRenteeResponse, error) {
     if in == nil || in.Rentee == nil {

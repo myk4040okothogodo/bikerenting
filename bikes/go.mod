@@ -1,14 +1,14 @@
-module github.com/myk4040okothogodo/bikerenting/rentees
+module github.com/myk4040okothogodo/bikerenting/bikes
 
 go 1.18
 
+replace github.com/myk4040okothogodo/bikerenting/bikes/server => ./server
+
 replace github.com/myk4040okothogodo/bikerenting/db => ../db
 
-replace github.com/myk4040okothogodo/bikerenting/rentees/server => ./server
-
 require (
+	github.com/myk4040okothogodo/bikerenting/bikes/server v0.0.0-00010101000000-000000000000
 	github.com/myk4040okothogodo/bikerenting/db v0.0.0-00010101000000-000000000000
-	github.com/myk4040okothogodo/bikerenting/rentees/server v0.0.0-00010101000000-000000000000
 )
 
 require (
@@ -16,7 +16,7 @@ require (
 	github.com/arangodb/go-velocypack v0.0.0-20200318135517-5af53c29c67e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
-	github.com/myk4040okothogodo/bikerenting/gen/go/proto/rentees v0.0.0-20220602115133-471c7e03d352 // indirect
+	github.com/myk4040okothogodo/bikerenting/gen/go/proto/bikes v0.0.0-20220602115133-471c7e03d352 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/net v0.0.0-20220531201128-c960675eff93 // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
